@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL}
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URL=${MONGODB_URL}
+      - POSTGRES_URL=${POSTGRES_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - SAML_ENTRY_POINT=${SAML_ENTRY_POINT}
+      - SAML_ISSUER=${SAML_ISSUER}
+      - SAML_CERT=${SAML_CERT}
+      - OAUTH2_CLIENT_ID=${OAUTH2_CLIENT_ID}
+      - OAUTH2_CLIENT_SECRET=${OAUTH2_CLIENT_SECRET}
+      - WATERMARK_SECRET=${WATERMARK_SECRET}
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

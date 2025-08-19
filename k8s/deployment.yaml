@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: academic-hub-frontend
+  labels:
+    app: academic-hub-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: academic-hub-frontend
+  template:
+    metadata:
+      labels:
+        app: academic-hub-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: your-registry/academic-hub-frontend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "https://api.your-domain.com"
+        - name: NEXT_PUBLIC_SOCKET_URL
+          value: "https://api.your-domain.com"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: academic-hub-backend
+  labels:
+    app: academic-hub-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: academic-hub-backend
+  template:
+    metadata:
+      labels:
+        app: academic-hub-backend
+    spec:
+      containers:
+      - name: backend
+        image: your-registry/academic-hub-backend:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "5000"
+        - name: MONGODB_URL
+          valueFrom:
+            secretKeyRef:
+              name: academic-hub-secrets
+              key: mongodb-url
+        - name: POSTGRES_URL
+          valueFrom:
+            secretKeyRef:
+              name: academic-hub-secrets
+              key: postgres-url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: academic-hub-secrets
+              key: jwt-secret
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: academic-hub-frontend-service
+spec:
+  selector:
+    app: academic-hub-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: academic-hub-backend-service
+spec:
+  selector:
+    app: academic-hub-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
