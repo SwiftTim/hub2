@@ -1,12 +1,19 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "academic-hub-platform",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "next build",
+    "build:all": "npm run build && cd backend && npm run build",
     "dev": "next dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:full": "concurrently \"npm run dev\" \"npm run dev:backend\"",
+    "export": "next build && next export",
+    "postinstall": "cd backend && npm install",
+    "install:all": "npm install && cd backend && npm install && cd ../mobile && npm install",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "start:backend": "cd backend && npm start"
   },
   "dependencies": {
     "@expo/vector-icons": "latest",
