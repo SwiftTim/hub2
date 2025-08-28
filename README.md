@@ -61,7 +61,7 @@ Academic Hub is a comprehensive full-stack university collaboration and assessme
 
 1. **Clone the repository**
    \`\`\`bash
-   git clone https://github.com/your-username/academic-hub.git
+   git clone https://github.com/SwiftTim/academic-hub.git
    cd academic-hub
    \`\`\`
 
